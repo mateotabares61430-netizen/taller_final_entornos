@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patrimonio Cultural de Colombia</title>
+
+    <!-- Fuentes de Google: una serif con carácter para títulos y una sans limpia para el texto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- TailwindCSS por CDN, se usa directo en las clases del HTML -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Aquí le decimos a Tailwind que el modo oscuro se activa agregando la clase "dark" al <html>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              selva: { DEFAULT: "#1B4332", oscuro: "#0F2A20" },
+              oro: "#C99A2E",
+              arcilla: "#B5471B",
+              crema: "#FAF6EC",
+            },
+            fontFamily: {
+              display: ["Fraunces", "serif"],
+              texto: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Nuestros estilos propios, cosas que Tailwind no cubre bien -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body
+    class="bg-crema dark:bg-selva-oscuro font-texto text-selva-oscuro dark:text-crema transition-colors duration-300"
+  >
+    <!-- ================= ENCABEZADO ================= -->
+    <header
+      class="sticky top-0 z-30 bg-crema/90 dark:bg-selva-oscuro/90 backdrop-blur border-b border-selva/10 dark:border-crema/10"
+    >
+      <div
+        class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4"
+      >
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🌿</span>
+          <div>
+            <h1
+              class="font-display text-xl md:text-2xl font-bold leading-tight"
+            >
+              Patrimonio Cultural de Colombia
+            </h1>
+            <p class="text-xs md:text-sm text-selva/70 dark:text-crema/60">
+              Lugares, memoria e historia natural del país
+            </p>
+          </div>
+        </div>
+
+        <!-- Botón para alternar modo oscuro -->
+        <button
+          id="botonModoOscuro"
+          class="shrink-0 w-11 h-11 rounded-full border border-selva/20 dark:border-crema/20 grid place-items-center hover:bg-selva/10 dark:hover:bg-crema/10 transition"
+          aria-label="Cambiar modo oscuro"
+        >
+          <span id="iconoModoOscuro">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= HERO ================= -->
+    <section class="max-w-6xl mx-auto px-4 pt-10 pb-6">
+      <p
+        class="uppercase tracking-widest text-xs font-semibold text-arcilla dark:text-oro mb-2"
+      >
+        Catálogo cultural
+      </p>
+      <h2
+        class="font-display text-3xl md:text-5xl font-bold max-w-2xl leading-tight"
+      >
+        Explora los lugares que guardan la memoria de Colombia
+      </h2>
+      <p class="mt-4 max-w-2xl text-selva/80 dark:text-crema/70">
+        Desde ríos de colores hasta nevados y pueblos cafeteros: conoce la
+        información recopilada directamente desde la API pública
+        <span class="font-semibold">API Colombia</span>.
+      </p>
+    </section>
+
+    <!-- ================= BARRA DE BÚSQUEDA Y FILTROS ================= -->
+    <section class="max-w-6xl mx-auto px-4 pb-6">
+      <div class="flex flex-col md:flex-row gap-3 md:items-center">
+        <!-- Campo de búsqueda -->
+        <div class="relative flex-1">
+          <span
+            class="absolute left-4 top-1/2 -translate-y-1/2 text-selva/50 dark:text-crema/50"
+            >🔍</span
+          >
+          <input
+            id="campoBusqueda"
+            type="text"
+            placeholder="Busca un lugar o una ciudad..."
+            class="w-full pl-11 pr-4 py-3 rounded-xl border border-selva/20 dark:border-crema/20 bg-white dark:bg-selva/40 focus:outline-none focus:ring-2 focus:ring-oro"
+          />
+        </div>
+
+        <!-- Filtro por departamento -->
+        <select
+          id="filtroDepartamento"
+          class="py-3 px-4 rounded-xl border border-selva/20 dark:border-crema/20 bg-white dark:bg-selva/40 focus:outline-none focus:ring-2 focus:ring-oro"
+        >
+          <option value="todos">Todos los departamentos</option>
+        </select>
+
+        <!-- Filtro adicional: solo lugares con imagen disponible -->
+        <label
+          class="flex items-center gap-2 py-3 px-4 rounded-xl border border-selva/20 dark:border-crema/20 bg-white dark:bg-selva/40 cursor-pointer select-none"
+        >
+          <input
+            id="filtroSoloConImagen"
+            type="checkbox"
+            class="w-4 h-4 accent-arcilla"
+          />
+          <span class="text-sm">Solo con imagen</span>
+        </label>
+      </div>
+
+      <!-- Contador de resultados -->
+      <p
+        id="contadorResultados"
+        class="mt-3 text-sm text-selva/60 dark:text-crema/50"
+      ></p>
+    </section>
+
+    <!-- Estado de carga -->
+    <div
+      id="indicadorCarga"
+      class="max-w-6xl mx-auto px-4 py-16 flex flex-col items-center gap-3"
+    >
+      <div class="cargador-spinner"></div>
+      <p
+        id="textoIndicadorCarga"
+        class="text-sm text-selva/70 dark:text-crema/60"
+      >
+        Cargando el catálogo desde la API...
+      </p>
+    </div>
+
+    <!--  Mensaje de error  -->
+    <div
+      id="mensajeError"
+      class="hidden max-w-6xl mx-auto px-4 py-16 text-center"
+    >
+      <p class="text-4xl mb-3">⚠️</p>
+      <p class="font-semibold">
+        No fue posible cargar la información de la API.
+      </p>
+      <p class="text-sm text-selva/60 dark:text-crema/50">
+        Verifica tu conexión e intenta nuevamente.
+      </p>
+      <button
+        id="botonReintentar"
+        class="mt-4 px-5 py-2 rounded-full bg-arcilla text-crema font-semibold hover:bg-arcilla/90 transition"
+      >
+        Reintentar
+      </button>
+    </div>
+
+    <!-- Contenedor de tarjetas -->
+    <main class="max-w-6xl mx-auto px-4 pb-20">
+      <div
+        id="contenedorTarjetas"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+      ></div>
+
+      <!-- Mensaje cuando no hay resultados con los filtros aplicados -->
+      <div id="mensajeSinResultados" class="hidden text-center py-16">
+        <p class="text-4xl mb-3">🧭</p>
+        <p class="font-semibold">No encontramos lugares con esos filtros.</p>
+        <p class="text-sm text-selva/60 dark:text-crema/50">
+          Intenta con otra palabra o cambia el departamento.
+        </p>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-selva/10 dark:border-crema/10 py-8">
+      <div
+        class="max-w-6xl mx-auto px-4 text-center text-sm text-selva/60 dark:text-crema/50"
+      >
+        <p>
+          Datos obtenidos de
+          <a
+            href="https://api-colombia.com"
+            target="_blank"
+            class="underline hover:text-arcilla dark:hover:text-oro"
+            >API Colombia</a
+          >
+          · Proyecto académico de entornos web
+        </p>
+      </div>
+    </footer>
+
+    <!-- Modal de detalle -->
+    <div
+      id="fondoModal"
+      class="hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    >
+      <div
+        id="cajaModal"
+        class="bg-crema dark:bg-selva-oscuro w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl relative animate-aparecer"
+      >
+        <!-- Botón cerrar -->
+        <button
+          id="botonCerrarModal"
+          class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/40 text-white grid place-items-center hover:bg-black/60 transition"
+        >
+          ✕
+        </button>
+
+        <!-- Imagen del lugar -->
+        <img
+          id="imagenModal"
+          src=""
+          alt=""
+          class="w-full h-64 md:h-80 object-cover rounded-t-2xl"
+        />
+
+        <div class="p-6 md:p-8">
+          <p
+            id="lugarModal"
+            class="text-sm font-semibold text-arcilla dark:text-oro uppercase tracking-wide"
+          ></p>
+          <h3
+            id="tituloModal"
+            class="font-display text-2xl md:text-3xl font-bold mt-1"
+          ></h3>
+          <p
+            id="descripcionModal"
+            class="mt-4 text-selva/80 dark:text-crema/70 leading-relaxed"
+          ></p>
+
+          <!-- Recomendaciones: otros lugares del mismo departamento -->
+          <div
+            id="bloqueRecomendaciones"
+            class="mt-8 border-t border-selva/10 dark:border-crema/10 pt-6"
+          >
+            <p
+              class="font-semibold text-sm uppercase tracking-wide text-selva/70 dark:text-crema/60 mb-3"
+            >
+              También te puede interesar
+            </p>
+            <div
+              id="contenedorRecomendaciones"
+              class="grid grid-cols-1 sm:grid-cols-3 gap-3"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
