@@ -1,0 +1,69 @@
+/* Transición al pasar al modo oscuro */
+* {
+  scrollbar-width: thin;
+}
+
+/* Recortar la descripción de cada tarjeta a 3 líneas, con "..." al final */
+.recorte-tres-lineas {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Spinner de carga mientras llega la respuesta de la API */
+.cargador-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(27, 67, 50, 0.15);
+  border-top-color: #b5471b;
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animación de entrada para el modal de detalle */
+.animate-aparecer {
+  animation: aparecer 0.25s ease-out;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Animación de entrada para cada tarjeta cuando se pinta en pantalla */
+.tarjeta-lugar {
+  animation: aparecer-tarjeta 0.35s ease-out both;
+}
+
+@keyframes aparecer-tarjeta {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar del modal, para que combine con la paleta del sitio */
+#cajaModal::-webkit-scrollbar {
+  width: 8px;
+}
+#cajaModal::-webkit-scrollbar-thumb {
+  background-color: rgba(181, 71, 27, 0.4);
+  border-radius: 999px;
+}
